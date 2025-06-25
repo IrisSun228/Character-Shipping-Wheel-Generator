@@ -1,0 +1,235 @@
+/* Custom styles for the app */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align content from the top */
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll for the body */
+    overflow-y: auto; /* Allow vertical scroll if content is too tall */
+    padding-top: 2rem; /* Add some padding at the top */
+    padding-bottom: 2rem; /* Add some padding at the bottom */
+}
+
+#app-container {
+    background-color: #ffffff;
+    border-radius: 1rem; /* rounded-2xl */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+    padding: 2rem; /* p-8 */
+    width: 100%;
+    max-width: 90vw; /* Responsive width */
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+#wheel-container {
+    position: relative;
+    border: 2px dashed #cbd5e0; /* border-slate-300 */
+    border-radius: 1rem;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible; /* Allow images to extend beyond the dashed border */
+    flex-shrink: 0;
+    flex-grow: 0;
+    background-color: var(--wheel-bg-color, #f8fafc); /* Dynamic background color */
+}
+
+.character-image-wrapper {
+    position: absolute;
+    width: 80px; /* Fixed size for character images */
+    height: 80px;
+    border-radius: 9999px; /* rounded-full */
+    overflow: hidden;
+    /* Border and shadow dynamically applied via JS based on toggle */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    background-color: #e2e8f0; /* slate-200, fallback */
+    transition: transform 0.3s ease-out; /* Smooth movement */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center the image within its circle */
+}
+
+.character-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fills the circular space while preserving aspect ratio */
+    border-radius: 9999px; /* rounded-full */
+    display: block; /* Remove extra space below image */
+}
+
+.character-label {
+    position: absolute;
+    padding: 2px 5px;
+    background-color: var(--label-bg-color, rgba(0, 0, 0, 0.6)); /* Dynamic label background color */
+    color: var(--label-text-color, white); /* Dynamic label text color */
+    font-size: 0.75rem; /* text-xs */
+    border-radius: 0.25rem; /* rounded-sm */
+    white-space: nowrap; /* Prevent text wrapping */
+    text-align: center;
+    pointer-events: none; /* Allow clicks to pass through to the image */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    z-index: 10; /* Ensure label is on top of other images if they overlap */
+    transform: translate(-50%, -50%); /* Centered by default */
+    /* Transformed by JS to be outside the circle */
+    display: flex; /* Added for perfect centering */
+    align-items: center; /* Added for perfect centering */
+    justify-content: center; /* Added for perfect centering */
+}
+
+
+/* Responsive adjustments for wheel container and images */
+@media (max-width: 768px) {
+    #wheel-container {
+        width: 100%;
+        height: auto; /* Allow height to adjust based on content if needed */
+        padding-bottom: 100%; /* Maintain aspect ratio (1:1) */
+        max-width: 400px; /* Max width for smaller screens */
+    }
+    .character-image-wrapper {
+        width: 60px; /* Smaller images on small screens */
+        height: 60px;
+        border-width: 2px;
+    }
+    .character-label {
+        font-size: 0.6rem;
+    }
+}
+
+/* Styles for draggable image list */
+#image-list-container {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 800px;
+    padding: 1rem;
+    border: 2px dashed #cbd5e0;
+    border-radius: 1rem;
+    background-color: #f8fafc; /* slate-50 */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    min-height: 100px; /* To show dashed border even if no images */
+}
+
+.draggable-image-item {
+    width: 70px;
+    height: 95px; /* Increased height to accommodate label input */
+    border-radius: 0.5rem; /* rounded-md */
+    overflow: visible; /* Allow content to escape for drag image setup */
+    border: 2px solid #a78bfa; /* violet-400 */
+    cursor: grab;
+    position: relative; /* For the index overlay and remove button */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* shadow-sm */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 5px; /* Space for remove button */
+}
+
+.draggable-image-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.draggable-image-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.draggable-image-item.drag-over {
+    border-color: #6366f1; /* indigo-500 */
+    background-color: #e0e7ff; /* indigo-100 */
+}
+
+.draggable-image-item .image-thumbnail {
+    width: 60px; /* Smaller for list */
+    height: 60px; /* Smaller for list */
+    border-radius: 0.5rem; /* rounded-md */
+    overflow: hidden;
+    flex-shrink: 0; /* Prevent shrinking */
+    pointer-events: none; /* Crucial for drag-and-drop to work on parent */
+}
+
+.draggable-image-item .image-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem; /* rounded-md */
+    pointer-events: none; /* Crucial for drag-and-drop to work on parent */
+}
+
+.draggable-image-item .index-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 35px); /* Cover image area, exclude label input */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 0.5rem;
+    pointer-events: none; /* Allow drag to pass through */
+}
+
+.draggable-image-item .label-input {
+    width: calc(100% - 10px); /* Adjust width */
+    padding: 2px 5px;
+    margin-top: 5px;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    border: 1px solid #cbd5e0;
+    text-align: center;
+    box-sizing: border-box; /* Include padding/border in width */
+    pointer-events: auto; /* Re-enable pointer events for input field */
+    z-index: 21; /* Ensure input is clickable */
+}
+.draggable-image-item .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #ef4444; /* red-500 */
+    color: white;
+    border: none;
+    border-radius: 9999px; /* rounded-full */
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    z-index: 20; /* Ensure it's clickable */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.draggable-image-item .remove-btn:hover {
+    background-color: #dc2626; /* red-600 */
+}
+
+/* Styles for color pickers */
+.color-picker-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.color-picker-wrapper input[type="color"] {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #cbd5e0;
+    border-radius: 0.5rem;
+    padding: 0;
+    cursor: pointer;
+}
