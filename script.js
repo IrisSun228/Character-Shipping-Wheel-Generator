@@ -17,58 +17,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const wheelBgColorPicker = document.getElementById('wheel-bg-color-picker');
     const labelTextColorPicker = document.getElementById('label-text-color-picker');
     const labelBgColorPicker = document.getElementById('label-bg-color-picker');
-    const downloadScaleInput = document.getElementById('download-scale-input'); // New
-    const downloadFormatRadios = document.querySelectorAll('input[name="download-format"]'); // New
-    const jpgQualityContainer = document.getElementById('jpg-quality-container'); // New
-    const jpgQualitySlider = document.getElementById('jpg-quality-slider'); // New
-    const jpgQualityValueSpan = document.getElementById('jpg-quality-value'); // New
+    const downloadScaleInput = document.getElementById('download-scale-input');
+    const downloadFormatRadios = document.querySelectorAll('input[name="download-format"]');
+    const jpgQualityContainer = document.getElementById('jpg-quality-container');
+    const jpgQualitySlider = document.getElementById('jpg-quality-slider');
+    const jpgQualityValueSpan = document.getElementById('jpg-quality-value');
     const customizationOptions = document.getElementById('customization-options');
     const imageListSection = document.getElementById('image-list-section');
     const imageListContainer = document.getElementById('image-list-container');
     const imageListPlaceholder = document.getElementById('image-list-placeholder');
 
     // --- Global State ---
-    let loadedCharacters = []; // Array of { id: string, url: string, label: string }
+    let loadedCharacters = [];
     let currentRadius = 0;
     let currentImageSize = 0;
-    const DOWNLOAD_BASE_RESOLUTION_SCALE = 4; // Default scale for images in download context
-    const MAX_SAVABLE_IMAGE_DIMENSION = 1000; // Max longest side for images saved to localStorage
-    let draggedItemIndex = null; // For drag and drop
+    const DOWNLOAD_BASE_RESOLUTION_SCALE = 4;
+    const MAX_SAVABLE_IMAGE_DIMENSION = 1000;
+    let draggedItemIndex = null;
 
     // --- Initial UI State ---
     function resetUI() {
+        // Keep customization and image list sections visible
         downloadButton.style.display = 'none';
-        outlineToggleContainer.style.display = 'none';
-        customizationOptions.style.display = 'none';
-        imageListSection.style.display = 'none';
         clearAllButton.style.display = 'none';
         randomizeButton.style.display = 'none';
         saveButton.style.display = 'none';
         loadButton.style.display = 'inline-block'; // Load button always visible
+
         wheelContainer.innerHTML = '';
         placeholderText.classList.remove('hidden');
         imageListContainer.innerHTML = '';
         imageListPlaceholder.classList.remove('hidden');
-        // Reset wheel container size to default when empty
         wheelContainer.style.width = '600px';
         wheelContainer.style.height = '600px';
-        // Reset colors to default and apply
+
+        // Reset color pickers and toggle
         outlineColorPicker.value = "#6366f1";
         wheelBgColorPicker.value = "#FFFFFF";
         labelTextColorPicker.value = "#FFFFFF";
-        labelBgColorPicker.value = "#000000";
-        outlineToggle.checked = true; // Default to outlines visible
-        downloadScaleInput.value = DOWNLOAD_BASE_RESOLUTION_SCALE; // Reset download scale
-        document.querySelector('input[name="download-format"][value="png"]').checked = true; // Default to PNG
-        jpgQualitySlider.value = 0.9;
-        jpgQualityValueSpan.textContent = 0.9;
-        jpgQualityContainer.style.display = 'none'; // Hide JPG quality by default
+        labelBgColorPicker.value = "#636363"; // Default label background color to grey (rgb 99,99,99)
+        outlineToggle.checked = true;
+
+        // Reset download options
+        downloadScaleInput.value = DOWNLOAD_BASE_RESOLUTION_SCALE;
+        document.querySelector('input[name="download-format"][value="png"]').checked = true;
+        jpgQualitySlider.value = 1.0; // Default JPEG quality to 1.0
+        jpgQualityValueSpan.textContent = 1.0; // Update display
+        jpgQualityContainer.style.display = 'none';
+
         applyColorsAndOutlines(); // Apply to live view
     }
     resetUI(); // Call on initial load
 
-    // Attempt to load state on startup
-    loadState();
+    loadState(); // Attempt to load state on startup
 
     // --- Event Listeners ---
     uploadButton.addEventListener('click', () => imageUploadInput.click());
@@ -86,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
     outlineToggle.addEventListener('change', applyColorsAndOutlines);
 
     downloadScaleInput.addEventListener('input', () => {
-        // Ensure scale is a valid number
         let val = parseInt(downloadScaleInput.value);
         if (isNaN(val) || val < 1) {
             downloadScaleInput.value = 1;
@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle download format radio changes
     downloadFormatRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'jpeg') {
@@ -106,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Update JPG quality display
     jpgQualitySlider.addEventListener('input', () => {
         jpgQualityValueSpan.textContent = parseFloat(jpgQualitySlider.value).toFixed(2);
     });
@@ -131,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 wrapper.style.border = 'none';
                 wrapper.style.boxShadow = 'none';
-                wrapper.style.backgroundColor = 'transparent'; // Remove background if no border
+                wrapper.style.backgroundColor = 'transparent';
             }
         });
     }
@@ -159,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
                 reader.readAsDataURL(file);
-            }
+                    }
         });
     }
 
@@ -167,9 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         drawCharacterWheel(loadedCharacters);
         renderImageList(loadedCharacters);
         downloadButton.style.display = 'inline-block';
-        outlineToggleContainer.style.display = 'flex';
-        customizationOptions.style.display = 'flex';
-        imageListSection.style.display = 'block';
         clearAllButton.style.display = 'inline-block';
         randomizeButton.style.display = 'inline-block';
         saveButton.style.display = 'inline-block';
@@ -230,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             imgWrapper.dataset.charId = char.id;
 
             const img = document.createElement('img');
-            img.src = char.url; // Use char.url which might be empty on loadState
+            img.src = char.url;
             img.alt = `Character ${char.label || index + 1}`;
             imgWrapper.appendChild(img);
             wheelContainer.appendChild(imgWrapper);
@@ -275,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const imgThumbnailWrapper = document.createElement('div');
             imgThumbnailWrapper.classList.add('image-thumbnail');
             const img = document.createElement('img');
-            img.src = char.url; // Use char.url which might be empty on loadState
+            img.src = char.url;
             img.alt = `Character ${char.label || index + 1}`;
             img.loading = 'lazy';
             imgThumbnailWrapper.appendChild(img);
@@ -435,9 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let width = img.width;
                 let height = img.height;
 
-                // Check if resizing is necessary
                 if (width <= maxLength && height <= maxLength) {
-                    resolve(imageDataUrl); // No resizing needed
+                    resolve(imageDataUrl);
                     return;
                 }
 
@@ -455,11 +449,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.height = height;
 
                 ctx.drawImage(img, 0, 0, width, height);
-                resolve(canvas.toDataURL('image/jpeg', 0.8)); // Save as JPEG for smaller size
+                resolve(canvas.toDataURL('image/jpeg', 0.8));
             };
             img.onerror = () => {
                 console.warn("Failed to load image for resizing, skipping:", imageDataUrl.substring(0, 50) + "...");
-                resolve(imageDataUrl); // Resolve with original if error
+                resolve(imageDataUrl);
             };
             img.src = imageDataUrl;
         });
@@ -469,13 +463,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let imagesResized = 0;
             const savableCharactersPromises = loadedCharacters.map(async char => {
-                if (char.url) { // Only process if image URL exists
+                if (char.url) {
                     const originalImg = new Image();
                     await new Promise(resolve => {
                         originalImg.onload = resolve;
                         originalImg.onerror = () => {
                             console.warn(`Failed to load original image for size check: ${char.id}`);
-                            resolve(); // Resolve even on error
+                            resolve();
                         };
                         originalImg.src = char.url;
                     });
@@ -488,7 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         return { id: char.id, url: char.url, label: char.label };
                     }
                 }
-                return char; // Return as is if no URL or already processed
+                return char;
             });
 
             const savableCharacters = await Promise.all(savableCharactersPromises);
@@ -507,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let messageType = "green";
             if (imagesResized > 0) {
                 message = `Configuration saved! Note: ${imagesResized} image(s) were resized to fit within the ${MAX_SAVABLE_IMAGE_DIMENSION}px limit for saving.`;
-                messageType = "blue"; // Use blue for informational
+                messageType = "blue";
             }
             displayMessageBox(message, messageType);
 
@@ -526,17 +520,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedConfig = localStorage.getItem('characterWheelConfig');
             if (savedConfig) {
                 const parsedConfig = JSON.parse(savedConfig);
-                loadedCharacters = parsedConfig.characters || []; // Images are now included!
+                loadedCharacters = parsedConfig.characters || [];
 
                 outlineColorPicker.value = parsedConfig.outlineColor || "#6366f1";
                 wheelBgColorPicker.value = parsedConfig.wheelBgColor || "#FFFFFF";
                 labelTextColorPicker.value = parsedConfig.labelTextColor || "#FFFFFF";
-                labelBgColorPicker.value = parsedConfig.labelBgColor || "#000000";
+                labelBgColorPicker.value = parsedConfig.labelBgColor || "#636363"; // Set default grey color on load
                 outlineToggle.checked = parsedConfig.outlineToggleChecked !== undefined ? parsedConfig.outlineToggleChecked : true;
 
 
                 if (loadedCharacters.length > 0) {
-                    // Preload all images to ensure they are ready before drawing the wheel
                     const preloadPromises = loadedCharacters.map(char => {
                         if (char.url) {
                             return new Promise((resolve) => {
@@ -544,16 +537,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 img.onload = resolve;
                                 img.onerror = () => {
                                     console.warn(`Failed to preload image: ${char.id}. It might not display correctly.`);
-                                    resolve(); // Resolve even on error to not block the process
+                                    resolve();
                                 };
                                 img.src = char.url;
                             });
                         }
-                        return Promise.resolve(); // Resolve immediately if no URL
+                        return Promise.resolve();
                     });
                     await Promise.all(preloadPromises);
 
-                    postUploadSetup(); // Re-initialize UI based on loaded data
+                    postUploadSetup();
                     displayMessageBox("Wheel configuration loaded successfully!", "green");
                 } else {
                     resetUI();
@@ -573,11 +566,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Custom message box function (replaces alert/confirm)
     function displayMessageBox(message, type = "info") {
         const existingBox = document.querySelector('.message-box');
-        if (existingBox) existingBox.remove(); // Remove any previous messages
+        if (existingBox) existingBox.remove();
 
         const messageBox = document.createElement('div');
         messageBox.classList.add('message-box', 'fixed', 'top-1/2', 'left-1/2', '-translate-x-1/2', '-translate-y-1/2', 'bg-white', 'p-6', 'rounded-lg', 'shadow-xl', 'z-50', 'text-center');
-        messageBox.style.maxWidth = 'calc(100vw - 40px)'; // Max width with some margin
+        messageBox.style.maxWidth = 'calc(100vw - 40px)';
 
         let textColor = 'text-gray-800';
         let buttonBg = 'bg-blue-500 hover:bg-blue-600';
@@ -602,7 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
             messageBox.remove();
         });
 
-        // Auto-remove after a few seconds for info/success messages
         if (type === 'green' || type === 'blue') {
             setTimeout(() => {
                 if (messageBox.parentNode) messageBox.remove();
@@ -706,7 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tempCtx.lineTo(borderRadius, canvasHeight);
         tempCtx.quadraticCurveTo(0, canvasHeight, 0, canvasHeight - borderRadius);
         tempCtx.lineTo(0, borderRadius);
-        tempCtx.quadraticCurveCurveTo(0, 0, borderRadius, 0); // Corrected typo here
+        tempCtx.quadraticCurveTo(0, 0, borderRadius, 0);
         tempCtx.closePath();
         tempCtx.fill();
 
@@ -732,12 +724,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const downloadLabelTextColor = labelTextColorPicker.value;
         const downloadLabelBgColor = labelBgColorPicker.value;
 
-        const downloadScale = parseFloat(downloadScaleInput.value); // Get user defined scale
+        const downloadScale = parseFloat(downloadScaleInput.value);
         const downloadFormat = document.querySelector('input[name="download-format"]:checked').value;
         const downloadJpgQuality = parseFloat(jpgQualitySlider.value);
 
 
-        // Constants for label positioning (scaled for download resolution)
         const baseLabelPaddingX = 5;
         const baseLabelPaddingY = 2;
         const baseLabelFontSize = 0.75 * 16;
@@ -748,7 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const scaledLabelBorderRadius = 0.25 * 16 * downloadScale;
 
 
-        // Calculate total visual diameter of the wheel for the download canvas
         const scaledImageSize = currentImageSize * downloadScale;
         const scaledRadius = currentRadius * downloadScale;
 
